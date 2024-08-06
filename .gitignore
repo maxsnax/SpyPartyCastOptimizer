@@ -1,0 +1,19 @@
+# IDE and temporary files
+.idea/
+.vs/
+*.vsidx
+
+# Python cache files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual environments
+venv/
+env/
+
+# Other common ignores
+*.log
+*.swp
+*.bak
