@@ -6,8 +6,10 @@ from pydub.playback import play
 from PIL import Image
 from playsound import playsound
 import time
+import os
 
 game_screenshot = Image.new('RGB', (25, 25), (255, 255, 255))
+base_dir = os.path.dirname(__file__)
 
 
 class Character:
@@ -34,17 +36,19 @@ def calculate_center(character):
     character.center_point = (x + (width / 2), y + (height / 2) + height_offset)
 
 
+# Examines pixel colors on screen to determine the spy portrait
 def find_spy(character):
-    screenshot = Image.open(r'C:\Users\Max\PycharmProjects\SpyPartyCharacterPicker\images\cast_screenshot.png')
+    screenshot_path = os.path.join(base_dir, 'images', 'cast_screenshot.png')
+    screenshot = Image.open(screenshot_path)
     width, height = screenshot.size
+
     for y in range(height):
         for x in range(width):
             pixel_color = screenshot.getpixel((x, y))
             if pixel_color == (0, 191, 0):
-                file = r'C:\Users\Max\PycharmProjects\SpyPartyCharacterPicker\images\character_screenshots\\'
-                screenshot_name = file + character.name + '.png'
+                fileSavePath = os.path.join(base_dir, 'images', 'character_screenshots', f'{character.name}.png')
                 crop = screenshot.crop((x - 5, y - 5, x + 150, y + 150))
-                crop.save(screenshot_name)
+                crop.save(fileSavePath)
                 print("Found spy: " + character.name)
                 character.coords = (x - 5, y - 5, x + 150, y + 150)
                 return x, y
@@ -54,7 +58,8 @@ def find_spy(character):
 
 def get_game_data():
     data = game_screenshot.crop((50, 100, 425, 600))
-    data.save(r'C:\Users\Max\PycharmProjects\SpyPartyCharacterPicker\images\game_data.png')
+    dataSavePath = os.path.join(base_dir, 'images', 'game_data.png')
+    data.save(dataSavePath)
     gray_screenshot = data.convert('L') # Convert the screenshot to grayscale
     pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
     text = pytesseract.image_to_string(gray_screenshot)
@@ -80,7 +85,7 @@ def get_game_data():
         guest_count = int(lines[7].split(':')[-1].strip())
         game_time = int(lines[8].split(':')[1].strip().split(':')[0]) * 60
     game_properties = [venue, mode, guest_count, game_time]
-    formatted_output = " Venue: {}\n Mode: {}\n Guests: {}\n Time: {}\n".format(venue, mode, guest_count, time)
+    formatted_output = " Venue: {}\n Mode: {}\n Guests: {}\n Time: {}\n".format(venue, mode, guest_count, game_time)
     print(formatted_output)
 
     return game_properties
@@ -153,7 +158,7 @@ def optimize_cast():
 # ======================================================================================================================
 def get_characters():
     print("Starting Search")
-    character_path = r'C:\Users\Max\PycharmProjects\SpyPartyCharacterPicker\images\character_portraits'
+    character_path = os.path.join(base_dir, 'images', 'character_portraits')
     count = 0   # used to determine how many people have been matched
     extra_pixels = 5    # used for cropping top, bottom, left, right images of matched portraits
     screen_width, screen_height = pyautogui.size()  # used for creating screenshots of specific areas based off ratio
@@ -161,10 +166,12 @@ def get_characters():
     search_region = (0, height_restriction, screen_width, screen_height - 60)    # area searched for portraits
     global game_screenshot
     game_screenshot = pyautogui.screenshot()   # saved screenshot of characters/roles
-    game_screenshot.save(r'C:\Users\Max\PycharmProjects\SpyPartyCharacterPicker\images\game_screenshot.png')
+    screenshotPath = os.path.join(base_dir, 'images', 'game_screenshot.png')
+    game_screenshot.save(screenshotPath)
     cast_screenshot = game_screenshot
     cast_screenshot = cast_screenshot.crop(search_region)
-    cast_screenshot.save(r'C:\Users\Max\PycharmProjects\SpyPartyCharacterPicker\images\cast_screenshot.png')
+    cast_screenshotPath = os.path.join(base_dir, 'images', 'cast_screenshot.png')
+    cast_screenshot.save(cast_screenshotPath)
     unselected = []
     civilians = []
     unknown = []
@@ -173,8 +180,9 @@ def get_characters():
     for char_code in range(ord('A'), ord('U')+1):
         character = character_list[index(chr(char_code))]
         name = str(character.name)
-        character_portrait = character_path + '\\' + name + '.png'
-        screenshot_name = r'C:\Users\Max\PycharmProjects\SpyPartyCharacterPicker\images\character_screenshots\\' + name + '.png'
+        character_portrait = os.path.join(character_path, f'{name}.png')
+
+        portrait_screenshot_path = os.path.join(base_dir, 'images', 'character_screenshots', f'{name}.png')
         print("Searching for: " + character_portrait)
         match = pyautogui.locate(character_portrait, cast_screenshot, grayscale=True, confidence=0.85)
         if match:
@@ -184,7 +192,7 @@ def get_characters():
             right = min(cast_screenshot.width, match.left + match.width + extra_pixels)
             bottom = min(cast_screenshot.height, match.top + match.height + extra_pixels + 5)
             match_photo = cast_screenshot.crop((left, top, right, bottom))
-            match_photo.save(screenshot_name)
+            match_photo.save(portrait_screenshot_path)
             character.coords = (left, top, right - left, bottom - top)
             role = get_role(character)
             character.role = role
@@ -204,8 +212,9 @@ def get_characters():
 
         else:
             print("----------------- Did not find " + name)
-            portrait = Image.open(r'C:\Users\Max\PycharmProjects\SpyPartyCharacterPicker\images\RandomCast.png')
-            portrait.save(screenshot_name)
+            random_cast_path = os.path.join(base_dir, 'images', 'RandomCast.png')
+            portrait = Image.open(random_cast_path)
+            portrait.save(portrait_screenshot_path)
             unknown.append(character)
 
     if len(unknown) == 1:
@@ -229,8 +238,8 @@ def get_characters():
 
 
 def get_role(character):
-    file = r'C:\Users\Max\PycharmProjects\SpyPartyCharacterPicker\images\character_screenshots\\' + character.name + '.png'
-    portrait_image = Image.open(file)
+    character_screenshots_path = os.path.join(base_dir, 'images', 'character_screenshots', f'{character.name}.png')
+    portrait_image = Image.open(character_screenshots_path)
     x, y, width, height = character.coords
     character.center_point = (x + (width / 2), y + (height / 2))
 
@@ -258,8 +267,8 @@ def get_role(character):
 
 
 def read_preset(number):
-    file = r'C:\Users\Max\PycharmProjects\SpyPartyCharacterPicker\presets\preset_' + str(number) + '.txt'
-    with open(file) as file:
+    preset_file_path = os.path.join(base_dir, 'presets', f'preset_{str(number)}.txt')
+    with open(preset_file_path) as file:
         data = []
         for line in file:
             key, value = line.strip().split('=')

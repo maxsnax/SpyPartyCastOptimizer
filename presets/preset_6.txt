@@ -19,4 +19,4 @@ R=6
 S=10
 T=10
 U=10
-Amba=S
+Amba=C

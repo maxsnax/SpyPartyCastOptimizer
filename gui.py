@@ -21,11 +21,12 @@ def main():
     global root
     root = customtkinter.CTk()
     root.title("SpyParty Guest Optimizer")
-    root.geometry("1400x715")
+    root.geometry("1280x500")
     root.resizable(width=False, height=False)
     root.iconbitmap(r"C:\Users\Max\PycharmProjects\SpyPartyCharacterPicker\images\S.ico")
     root.grid_columnconfigure(1, weight=1)
     root.grid_rowconfigure(1, weight=1)
+    root.configure(fg_color="black")
 
     # =================================================================================================================
     #
@@ -34,16 +35,8 @@ def main():
     # =================================================================================================================
     # parent_frame main frame which all other frames will be organized into
     # =================================================================================================================
-    parent_frame = customtkinter.CTkFrame(master=root)
-    parent_frame.pack(padx=25, pady=25)
-
-    # =================================================================================================================
-    # title_frame holds the label for the program name within the top of the parent_frame
-    # =================================================================================================================
-    title_frame = customtkinter.CTkFrame(master=parent_frame)
-    title_frame.grid(row=0, column=0, sticky='w')
-    title_label = customtkinter.CTkLabel(master=title_frame, text="SpyParty Guest Optimizer")
-    title_label.grid(row=0, column=0, columnspan=2, sticky='n', padx=(20, 200), pady=(0, 0))
+    parent_frame = customtkinter.CTkFrame(master=root, fg_color = "black", bg_color="black")
+    parent_frame.pack(padx=0, pady=0)
 
     # =================================================================================================================
     #
@@ -52,7 +45,7 @@ def main():
     # =================================================================================================================
     # desirability_frame contains all portraits of characters and their buttons to change their settings
     # =================================================================================================================
-    desirability_frame = customtkinter.CTkFrame(master=parent_frame)
+    desirability_frame = customtkinter.CTkFrame(master=parent_frame, bg_color="black")
     desirability_frame.grid(row=1, column=0, sticky='e')
     desirability_frame.rowconfigure = 5
     desirability_frame.columnconfigure = 30
@@ -117,125 +110,18 @@ def main():
         frame.grid(row=row_number, column=column_number, padx=5, pady=5)
         column_number += 1
 
-    # =================================================================================================================
-    #
-    # Presets and miscellaneous settings
-    #
-    # =================================================================================================================
-    # presets_frame has the buttons and labels for choosing and saving the current preset
-    # =================================================================================================================
-    presets_frame = customtkinter.CTkFrame(master=parent_frame, border_color="black", border_width=2)
-    presets_frame.grid(row=2, column=0, sticky='w')
-    presets_frame.rowconfigure = 2
-    presets_frame.columnconfigure = 10
-
-    row_number = 0
-    col_offset = 0
-
-    presets_header = customtkinter.CTkLabel(master=presets_frame, text="Preset Settings")
-    presets_header.grid(row=row_number, column=0, rowspan=1, columnspan=10, padx=5, pady=(5, 0), sticky='news')
-
-    row_number += 1
-
-    # Preset buttons for choosing saved desirability of characters
-    global selected_preset
-    selected_preset = 1
-    button_padding = (5, 0)
-    text_padding = (0, 5)
-
-    def preset_1_click():
-        global selected_preset
-        selected_preset = 1
-        print("Preset " + str(selected_preset) + " Selected")
-        preset_2_button.deselect()
-        preset_3_button.deselect()
-        load_preset(1)
-
-    row_number = 1
-    starting_column = 0
-    col_offset = 0
-
-    preset_1_button = customtkinter.CTkRadioButton(master=presets_frame, text="", width=20, height=20, command=preset_1_click)
-    preset_1_button.grid(row=row_number, column=starting_column + col_offset, rowspan=1, columnspan=1, padx=button_padding, pady=5, sticky='ne')
-    col_offset += 1
-    preset_1_label = customtkinter.CTkLabel(master=presets_frame, text="Preset 1")
-    preset_1_label.grid(row=row_number, column=starting_column + col_offset, rowspan=1, columnspan=1, padx=text_padding, pady=5, sticky='ne')
-    col_offset += 1
-
-    def preset_2_click():
-        global selected_preset
-        selected_preset = 2
-        print("Preset " + str(selected_preset) + " Selected")
-        preset_1_button.deselect()
-        preset_3_button.deselect()
-        load_preset(2)
-
-    preset_2_button = customtkinter.CTkRadioButton(master=presets_frame, text="", width=20, height=20, command=preset_2_click)
-    preset_2_button.grid(row=row_number, column=starting_column + col_offset, rowspan=1, columnspan=1, padx=button_padding, pady=5, sticky='ne')
-    col_offset += 1
-    preset_2_label = customtkinter.CTkLabel(master=presets_frame, text="Preset 2")
-    preset_2_label.grid(row=row_number, column=starting_column + col_offset, rowspan=1, columnspan=1, padx=text_padding, pady=5, sticky='ne')
-    col_offset += 1
-
-    def preset_3_click():
-        global selected_preset
-        selected_preset = 3
-        print("Preset " + str(selected_preset) + " Selected")
-        preset_1_button.deselect()
-        preset_2_button.deselect()
-        load_preset(3)
-
-    preset_3_button = customtkinter.CTkRadioButton(master=presets_frame, text="", width=20, height=20, command=preset_3_click)
-    preset_3_button.grid(row=row_number, column=starting_column + col_offset, rowspan=1, columnspan=1, padx=button_padding, pady=5, sticky='ne')
-    col_offset += 1
-    preset_3_label = customtkinter.CTkLabel(master=presets_frame, text="Preset 3")
-    preset_3_label.grid(row=row_number, column=starting_column + col_offset, rowspan=1, columnspan=1, padx=text_padding, pady=5, sticky='ne')
-    col_offset += 1
-
-    def save_preset():
-        global selected_preset
-        print("Saving Preset to " + str(selected_preset))
-        filename = r'C:\Users\Max\PycharmProjects\SpyPartyCharacterPicker\presets\preset_' + str(
-            selected_preset) + '.txt'
-        file = open(filename, 'w')
-        for person in character_list:
-            file.write(person.name + "=" + person.desirability + '\n')
-        file.write("Amba=" + characters.get_amba().name + '\n')
-
-    def load_preset(number):
-        print("Currently Loading Preset Number: ", selected_preset)
-        count = 0
-        data = characters.read_preset(number)
-        for pair in data:
-            key, value = pair
-            if key != "Amba":
-                index = characters.index(key)
-                person = character_list[index]
-                button = person.desirability_option
-                button.set(value)
-            else:
-                ambassador = character_list[characters.index(value)]
-                characters.set_amba(ambassador)
-                print("Set ambassador to " + ambassador.alias)
-            count += 1
-
-    row_number += 1
-    preset_1_button.select()
-    preset_1_click()
-
-    save_presets_button = customtkinter.CTkButton(master=presets_frame, text="Save Current Preset", command=save_preset)
-    save_presets_button.grid(row=row_number, column=0, columnspan=6, padx=2, pady=3, sticky='news')
+    
 
     # =================================================================================================================
     # refinement_settings has the button for changing the Ambassador
     # =================================================================================================================
-    refinement_settings_frame = customtkinter.CTkFrame(master=parent_frame, border_color="black", border_width=2)
-    refinement_settings_frame.grid(row=2, column=0, padx=257, pady=0, sticky='w')
+    refinement_settings_frame = customtkinter.CTkFrame(master=parent_frame, border_color="black", border_width=2, bg_color="black")
+    refinement_settings_frame.grid(row=2, column=0, padx=260, pady=0, sticky='w')
     refinement_settings_frame.rowconfigure = 3
     refinement_settings_frame.columnconfigure = 10
 
     # frame and menu for choosing ambassador
-    choose_amba_frame = customtkinter.CTkFrame(master=refinement_settings_frame, fg_color="black")
+    choose_amba_frame = customtkinter.CTkFrame(master=refinement_settings_frame, fg_color="black", bg_color="black")
     choose_amba_frame.grid(row=0, column=1)
     names_list = characters.get_alias_list()
 
@@ -260,6 +146,122 @@ def main():
         portrait = customtkinter.CTkImage(light_image=Image.open(path), size=(96, 96))
         amba_portrait.configure(image=portrait)
 
+    # Function to update the ambassador portrait and name
+    def update_ambassador_display(ambassador):
+        # Update the portrait
+        path = character_path + '\\' + ambassador.name + '.png'
+        portrait = customtkinter.CTkImage(light_image=Image.open(path), size=(96, 96))
+        amba_portrait.configure(image=portrait)
+
+        # Update the name
+        amba_option_menu.set(ambassador.alias)
+
+
     amba_option_menu.configure(command=update_ambassador_choice)
+
+    # =================================================================================================================
+    #
+    # Presets and miscellaneous settings
+    #
+    # =================================================================================================================
+    # presets_frame has the buttons and labels for choosing and saving the current preset
+    # =================================================================================================================
+    presets_frame = customtkinter.CTkFrame(master=parent_frame, border_color="black", border_width=2, bg_color="black")
+    presets_frame.grid(row=2, column=0, sticky='w')
+    presets_frame.rowconfigure = 2
+    presets_frame.columnconfigure = 10
+    number_presets = 6
+
+    row_number = 0
+    col_offset = 0
+
+    presets_header = customtkinter.CTkLabel(master=presets_frame, text="Preset Settings")
+    presets_header.grid(row=row_number, column=0, rowspan=1, columnspan=10, padx=5, pady=(5, 0), sticky='news')
+
+    row_number += 1
+
+    def load_preset(number):
+        print("Currently Loading Preset Number: ", number)
+        count = 0
+        data = characters.read_preset(number)  # Reads the preset file and returns key-value pairs
+
+        for key, value in data:
+            if key != "Amba":
+                index = characters.index(key)  # Get the index of the character
+                person = character_list[index]
+                button = person.desirability_option
+                button.set(value)  # Set the desirability in the option menu
+            else:
+                ambassador = character_list[characters.index(value)]
+                characters.set_amba(ambassador)
+                print("Set ambassador to " + ambassador.alias)
+                update_ambassador_display(ambassador)
+
+        count += 1
+
+    # Helper function to handle preset selection
+    def preset_click(preset_num):
+        global selected_preset
+        selected_preset = preset_num
+        print(f"Preset {preset_num} Selected")
+
+        # Deselect other radio buttons dynamically
+        for i in range(1, number_presets + 1):
+            if i != preset_num:
+                preset_buttons[i].deselect()
+
+        # Load the selected preset
+        load_preset(preset_num)
+
+
+    button_padding = (5, 0)
+    text_padding = (0, 5)
+
+    # Generic function to create preset radio buttons and labels
+    def create_preset_button(preset_num, row, column_offset):
+        preset_button = customtkinter.CTkRadioButton(
+            master=presets_frame, text="", width=20, height=20, 
+            command=lambda: preset_click(preset_num)
+        )
+        preset_button.grid(row=row, column=column_offset, rowspan=1, columnspan=1, padx=button_padding, pady=5, sticky='ne')
+
+        preset_label = customtkinter.CTkLabel(master=presets_frame, text=f"Preset {preset_num}")
+        preset_label.grid(row=row, column=column_offset + 1, rowspan=1, columnspan=1, padx=text_padding, pady=5, sticky='ne')
+
+        return preset_button
+
+    # Creating preset buttons dynamically
+    row_number = 1
+    starting_column = 0
+    col_offset = 0
+
+    # Dictionary to store radio buttons for later deselecting
+    preset_buttons = {}
+
+    for preset_num in range(1, number_presets + 1):
+        if ((col_offset / 2) % 3 == 0): # Create preset buttons rows of 3 columns
+            row_number += 1
+            col_offset = 0
+        preset_buttons[preset_num] = create_preset_button(preset_num, row_number, starting_column + col_offset)
+        col_offset += 2  # Move to the next set of columns
+
+    def save_preset():
+        global selected_preset
+        print("Saving Preset to " + str(selected_preset))
+        filename = r'C:\Users\Max\PycharmProjects\SpyPartyCharacterPicker\presets\preset_' + str(
+            selected_preset) + '.txt'
+        file = open(filename, 'w')
+        for person in character_list:
+            file.write(person.name + "=" + person.desirability + '\n')
+        file.write("Amba=" + characters.get_amba().name + '\n')
+
+    
+    # Select the first preset by default
+    preset_buttons[1].select()
+    preset_click(1)
+    row_number += 1
+
+    save_presets_button = customtkinter.CTkButton(master=presets_frame, text="Save Current Preset", command=save_preset)
+    save_presets_button.grid(row=row_number, column=0, columnspan=6, padx=2, pady=3, sticky='news')
 
     root.mainloop()
