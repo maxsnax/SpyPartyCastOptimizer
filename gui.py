@@ -2,8 +2,10 @@ import tkinter
 import customtkinter
 import characters
 from PIL import Image
+import os
 
-character_path = r'C:\Users\Max\PycharmProjects\SpyPartyCharacterPicker\images\character_portraits'
+base_dir = os.path.dirname(__file__)
+character_path = os.path.join(base_dir, 'images', 'character_portraits')
 global root
 global selected_preset
 global purple
@@ -23,7 +25,8 @@ def main():
     root.title("SpyParty Guest Optimizer")
     root.geometry("1280x500")
     root.resizable(width=False, height=False)
-    root.iconbitmap(r"C:\Users\Max\PycharmProjects\SpyPartyCharacterPicker\images\S.ico")
+    bitmap_path = os.path.join(base_dir, 'images', 'S.ico')
+    root.iconbitmap(bitmap_path)
     root.grid_columnconfigure(1, weight=1)
     root.grid_rowconfigure(1, weight=1)
     root.configure(fg_color="black")
@@ -77,8 +80,8 @@ def main():
         print("Creating character_frame for ", person.alias)
         character_frame = customtkinter.CTkFrame(master=portraits_frame, bg_color="white", fg_color="black", corner_radius=0)
 
-        path = character_path + '\\' + character.name + '.png'
-        portrait = customtkinter.CTkImage(light_image=Image.open(path), size=(96, 96))
+        character_portrait_path = os.path.join(character_path, f'{character.name}.png')
+        portrait = customtkinter.CTkImage(light_image=Image.open(character_portrait_path), size=(96, 96))
         character_portrait = customtkinter.CTkLabel(master=character_frame, image=portrait, text="", corner_radius=0)
         character_portrait.grid(row=0, column=0, columnspan=3, padx=5, pady=5, sticky='w')
 
@@ -128,8 +131,8 @@ def main():
     amba = characters.get_amba()
     amba_portrait_frame = customtkinter.CTkFrame(master=choose_amba_frame, border_color=purple, border_width=2, fg_color="black", bg_color="black")
     amba_portrait_frame.grid(row=0, column=0, padx=5, pady=5)
-    path = character_path + '\\' + amba.name + '.png'
-    portrait = customtkinter.CTkImage(light_image=Image.open(path), size=(96, 96))
+    amba_portrait_path = os.path.join(character_path, f'{amba.name}.png')
+    portrait = customtkinter.CTkImage(light_image=Image.open(amba_portrait_path), size=(96, 96))
     amba_portrait = customtkinter.CTkLabel(master=amba_portrait_frame, image=portrait, text="")
     amba_portrait.grid(row=0, column=0, columnspan=3, padx=5, pady=5, sticky='w')
 
@@ -142,15 +145,15 @@ def main():
         print("Updating amba to be ", amba.name, ": ", amba.alias)
         characters.set_amba(amba)
         amba_option_menu.configure(characters.get_amba().alias)
-        path = character_path + '\\' + amba.name + '.png'
-        portrait = customtkinter.CTkImage(light_image=Image.open(path), size=(96, 96))
+        amba_portrait_path = os.path.join(character_path, f'{amba.name}.png')
+        portrait = customtkinter.CTkImage(light_image=Image.open(amba_portrait_path), size=(96, 96))
         amba_portrait.configure(image=portrait)
 
     # Function to update the ambassador portrait and name
     def update_ambassador_display(ambassador):
         # Update the portrait
-        path = character_path + '\\' + ambassador.name + '.png'
-        portrait = customtkinter.CTkImage(light_image=Image.open(path), size=(96, 96))
+        amba_portrait_path = os.path.join(character_path, f'{ambassador.name}.png')
+        portrait = customtkinter.CTkImage(light_image=Image.open(amba_portrait_path), size=(96, 96))
         amba_portrait.configure(image=portrait)
 
         # Update the name
@@ -248,14 +251,12 @@ def main():
     def save_preset():
         global selected_preset
         print("Saving Preset to " + str(selected_preset))
-        filename = r'C:\Users\Max\PycharmProjects\SpyPartyCharacterPicker\presets\preset_' + str(
-            selected_preset) + '.txt'
-        file = open(filename, 'w')
-        for person in character_list:
-            file.write(person.name + "=" + person.desirability + '\n')
-        file.write("Amba=" + characters.get_amba().name + '\n')
+        filename_path = os.path.join(base_dir, 'presets', f'preset_{selected_preset}.txt')
+        with open(filename_path, 'w') as file:
+            for person in character_list:
+                file.write(person.name + "=" + person.desirability + '\n')
+            file.write("Amba=" + characters.get_amba().name + '\n')
 
-    
     # Select the first preset by default
     preset_buttons[1].select()
     preset_click(1)
